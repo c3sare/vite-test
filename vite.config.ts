@@ -4,6 +4,7 @@ import path from "path";
 export default defineConfig({
   /////////////////////////////////////////////////////////////////////////
   /// SHARED OPTIONS //////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////
   root: "./public/index.html",
   base: "/", // base url
   mode: "development", // or 'production' or as parameter --mode=production
@@ -104,5 +105,34 @@ export default defineConfig({
       usePolling: true, // use polling instead of native watchers if cpu utilization is high turn it of
     },
     middlewareMode: false, // defult=false create vite server in middleware mode , needed to SSR
+    fs: {
+      strict: true, // restrict to public files out of root workspace default=true since vite 2.7
+      allow: [], // restrict serving files when upper is true = ['..']
+      deny: [], // like upper but restricting acces to files on list default=['.env', '.env.*', '*.{crt,pem}']
+      cachedChecks: false, // EXPERIMENTAL, bufforing files of accessed dirs to avoid repeated filesystem operations
+    },
+    // origin: "http://127.0.0.1:8080", //Defines origin of the generated asset URLs during development
+    sourcemapIgnoreList(sourcePath, sourcemapPath) {
+      return sourcePath.includes("node_modules"); // This is the default value, and will add all files with node_modules in their paths to the ignore list.
+    },
+  },
+  ///////////////////////////////////////////////////////////////////////////////
+  // BUILD //////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
+  build: {
+    target: "modules", // browser compatiblity defaul=modules --- ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'], "esnext" - special value, using native dynamic import
+    // if build.minify=terser and terser is instaled below v5.16.0 - esnext will force down to es2021
+    modulePreload: {
+      polyfill: true, // default polyfill=true (boolean or {polyfill?: boolean, resolveDependencies?: fn})
+    },
+    outDir: "dist", // output directory default=dist
+    assetsDir: "assets", //output of generated assets (relative to build.outDir), not used in library mode
+    assetsInlineLimit: 4096, //default=4096 - files below this value are injected as base64 string to avoid unnecessery fetch's
+    cssCodeSplit: true, // default=true - split css code imported in async js chunks, if disabled then makes a single css file
+    cssTarget: [], //default=same value as build.target, transpiling css to older browsers in array specified browser and version like build.target
+    cssMinify: "esbuild", // changing default code minification default=same value from build.minify
+    sourcemap: false, //generate source map - boolean - as file | "inline" - in html file | "hidden" - commentet
+
+    rollupOptions: {},
   },
 });
