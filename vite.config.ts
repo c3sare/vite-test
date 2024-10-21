@@ -103,5 +103,6 @@ export default defineConfig({
       persistent: true, // keep server running after file changes
       usePolling: true, // use polling instead of native watchers if cpu utilization is high turn it of
     },
+    middlewareMode: false, // defult=false create vite server in middleware mode , needed to SSR
   },
 });
